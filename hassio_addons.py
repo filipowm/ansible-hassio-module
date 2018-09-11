@@ -44,7 +44,7 @@ EXAMPLES = '''
     state: absent
     name: {{ item }}
   with_items:
-    - a0d7b954_grafana
+    - grafana
     - core_dhcp_server
 
 # Start Samba share addon
@@ -72,20 +72,53 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 
+def install(ansible, name):
+  pass
+
+
+def uninstall(ansible, name):
+  pass
+
+
+def start(ansible, name):
+  pass
+
+
+def stop(ansible, name):
+  pass
+
+
+def update(ansible, name):
+  pass
+
+
+def __raise(ex):
+  raise ex
+
+
 def main():
   module = AnsibleModule(
     argument_spec=dict(
-      state = dict(required=True, choices=['present', 'absent', 'started', 'stopped', 'updated']),
+      state=dict(required=True, choices=['present', 'absent', 'started', 'stopped', 'updated']),
       name=dict(required=True, aliases=['addon'])
     ),
     # TODO
     supports_check_mode=False
   )
 
+  switch = {
+    'present': install,
+    'absent': uninstall,
+    'started': start,
+    'stopped': stop,
+    'updated': update
+  }
   state = module.params['state']
   name = module.params['name']
 
   try:
+    action = switch.get(state, lambda: __raise(Exception('Action is undefined')))
+    action(module, name)
     module.fail_json(msg='Not yet implemented')
   except Exception as e:
     module.fail_json(msg=to_native(e), exception=traceback.format_exc())
