@@ -72,57 +72,70 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 
+hassio = 'hassio'
+addons = 'ad'
+
+
+def with_name(name):
+    return "-name {}".format(name)
+
+
+def join(*args):
+    return " ".join(list(args))
+
+
 def install(ansible, name):
-  pass
+    cmd = join(hassio, addons, 'install', with_name(name))
+    return ansible.run_command(cmd)
 
 
 def uninstall(ansible, name):
-  pass
+    raise Exception("Not implemented")
 
 
 def start(ansible, name):
-  pass
+    raise Exception("Not implemented")
 
 
 def stop(ansible, name):
-  pass
+    raise Exception("Not implemented")
 
 
 def update(ansible, name):
-  pass
+    raise Exception("Not implemented")
 
 
 def __raise(ex):
-  raise ex
+    raise ex
 
 
 def main():
-  module = AnsibleModule(
-    argument_spec=dict(
-      state=dict(required=True, choices=['present', 'absent', 'started', 'stopped', 'updated']),
-      name=dict(required=True, aliases=['addon'])
-    ),
-    # TODO
-    supports_check_mode=False
-  )
+    module = AnsibleModule(
+        argument_spec=dict(
+            state=dict(required=True, choices=['present', 'absent', 'started', 'stopped', 'updated']),
+            name=dict(required=True, aliases=['addon'])
+        ),
+        # TODO
+        supports_check_mode=False
+    )
 
-  switch = {
-    'present': install,
-    'absent': uninstall,
-    'started': start,
-    'stopped': stop,
-    'updated': update
-  }
-  state = module.params['state']
-  name = module.params['name']
+    switch = {
+        'present': install,
+        'absent': uninstall,
+        'started': start,
+        'stopped': stop,
+        'updated': update
+    }
+    state = module.params['state']
+    name = module.params['name']
 
-  try:
-    action = switch.get(state, lambda: __raise(Exception('Action is undefined')))
-    action(module, name)
-    module.fail_json(msg='Not yet implemented')
-  except Exception as e:
-    module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+    try:
+        action = switch.get(state, lambda: __raise(Exception('Action is undefined')))
+        result = action(module, name)
+        module.exit_json(msg=result)
+    except Exception as e:
+        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
 if __name__ == '__main__':
-  main()
+    main()
