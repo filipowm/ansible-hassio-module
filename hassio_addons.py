@@ -84,25 +84,29 @@ def join(*args):
     return " ".join(list(args))
 
 
-def install(ansible, name):
-    cmd = join(hassio, addons, 'install', with_name(name))
+def execute_addon(ansible, action, name):
+    cmd = join(hassio, addons, action, with_name(name))
     return ansible.run_command(cmd)
 
 
+def install(ansible, name):
+    return execute_addon(ansible, 'install', name)
+
+
 def uninstall(ansible, name):
-    raise Exception("Not implemented")
+    return execute_addon(ansible, 'uninstall', name)
 
 
 def start(ansible, name):
-    raise Exception("Not implemented")
+    return execute_addon(ansible, 'start', name)
 
 
 def stop(ansible, name):
-    raise Exception("Not implemented")
+    return execute_addon(ansible, 'stop', name)
 
 
 def update(ansible, name):
-    raise Exception("Not implemented")
+    return execute_addon(ansible, 'update', name)
 
 
 def __raise(ex):
